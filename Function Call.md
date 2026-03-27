@@ -160,11 +160,6 @@ print("\n" + response.output_text)
 官方文档
 
 [ChatOpenAI integration - Docs by LangChain](https://docs.langchain.com/oss/python/integrations/chat/openai#using-azure-openai-v1-api-with-api-key)
-### 用LangChain框架复现一下
-
-官方文档
-
-[ChatOpenAI integration - Docs by LangChain](https://docs.langchain.com/oss/python/integrations/chat/openai#using-azure-openai-v1-api-with-api-key)
 
 ```python
 from langchain_openai import ChatOpenAI
