@@ -160,3 +160,46 @@ print("\n" + response.output_text)
 官方文档
 
 [ChatOpenAI integration - Docs by LangChain](https://docs.langchain.com/oss/python/integrations/chat/openai#using-azure-openai-v1-api-with-api-key)
+### 用LangChain框架复现一下
+
+官方文档
+
+[ChatOpenAI integration - Docs by LangChain](https://docs.langchain.com/oss/python/integrations/chat/openai#using-azure-openai-v1-api-with-api-key)
+
+```python
+from langchain_openai import ChatOpenAI
+from langchain.tools import tool
+from langchain.messages import HumanMessage, ToolMessage
+
+@tool
+def get_weather(location: str) -> str:
+    """Get weather from location.
+
+    Args:
+        location (str): The location, e.g. London, Beijing.
+    """
+    return f"The weather in {location} today is 25C."
+
+llm = ChatOpenAI()
+
+tools = [get_weather]
+llm = llm.bind_tools(tools)
+
+input_list = [HumanMessage(content="what is the weather like in London")]
+ai_msg = llm.invoke(input_list)
+input_list.append(ai_msg)
+
+if ai_msg.tool_calls:
+    for tool_call in ai_msg.tool_calls:
+        if tool_call["name"] == "get_weather":
+            tool_result = get_weather.invoke(tool_call["args"])
+            input_list.append(
+                ToolMessage(
+                    content=tool_result,
+                    tool_call_id=tool_call["id"],
+                )
+            )
+
+ai_msg = llm.invoke(input_list)
+print(ai_msg.content)
+```
