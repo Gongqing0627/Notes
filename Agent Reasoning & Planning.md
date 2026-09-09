@@ -10,7 +10,7 @@
 - **早期通用大语言模型**：已经能做一定的数学、逻辑判断和代码分析，但复杂多步问题容易出错。
 
 - **2022 年：思维链（CoT）研究**：研究者发现，在提示里给模型展示“逐步推导”的例子，就能提高它解决一些复杂问题的能力。**无需更换模型，也能改善推理表现。** [Google 研究](https://research.google/blog/language-models-perform-reasoning-via-chain-of-thought/)
-  ![[Pasted image 20260909181626.png]]
+ ![图片](<Pasted image 20260909181626.png>)
 
 - **2024 年 9 月：OpenAI o1-preview 发布**：一个重要转折点：通过大规模强化学习，专门训练模型分解问题、检查错误、尝试不同方法，并在回答前投入更多推理计算。它是这条路线的代表性产品，不能说是所有 AI 推理研究的起点。[发布说明](https://openai.com/index/learning-to-reason-with-llms/)
 
