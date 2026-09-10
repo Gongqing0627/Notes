@@ -29,3 +29,25 @@
 	- Long horizon（长程任务）：需要持续完成很多步骤，并始终保持目标、不遗漏要求。例如开发一个功能，从理解需求到修改代码、测试和修复。
 	- Multi-hop（多跳推理）：需要串联多条信息才能得到答案。例如先查公司创始人，再查其毕业学校，最后确定学校所在城市
 	- Multi-interactions（多次交互）：需要反复与用户、工具或环境互动，根据反馈继续行动。例如查询库存、发现缺货、查找替代品，再根据用户选择继续处理。
+>- Leverage models performance on hard tasks
+
+>**How ????????**
+![523](Pasted%20image%2020260910033515.png)
+## Decomposition
+
+### ReAct
+- **CoT-SC(Cot-Self-Consistency)**：让模型生成多份推理和答案，投票决定最终答案
+- **ReAct**：Thought（判断下一步）→ Action（执行操作）→ Observation（接收结果）→ 继续判断，直到完成
+- **ReAct → CoT-SC**：先执行ReAct，如果多步没有找到答案，采用CoT-SC。
+- **CoT-SC→ ReAct**：先生成n份推理和答案，如果没有大于n/2的统一答案，采用ReAct策略。
+![](Pasted%20image%2020260910203810.png)
+
+## Selection
+
+
+
+
+Reference:
+1. [Understanding the planning of LLM agents: A survey](https://arxiv.org/pdf/2402.02716)
+2. [ReAct](https://arxiv.org/pdf/2210.03629)
+
