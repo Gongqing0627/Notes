@@ -43,6 +43,9 @@
 - **CoT-SC→ ReAct**：先生成n份推理和答案，如果没有大于n/2的统一答案，采用ReAct策略。
 ![](Pasted%20image%2020260910203810.png)
 
+### Plan and Solve
+普通的“请一步步思考”可能仍然漏步骤。PS 先让模型明确需要做哪些事，主要针对这种**遗漏中间步骤**的问题。论文还提出 PS+，加入提取变量、注意计算等更详细的指令，减少计算错误。
+![](Pasted%20image%2020260914014717.png)
 ## Selection
 ### ToT
 ToT 将问题的求解过程组织成一棵思维树：每一步生成多个候选思路，由大模型评估各候选状态的潜力，再由搜索算法选择保留和继续探索的分支，必要时剪枝或回退，直到得到答案。
@@ -61,6 +64,7 @@ ToT 将问题的求解过程组织成一棵思维树：每一步生成多个候�
 Reference:
 1. [Understanding the planning of LLM agents: A survey](https://arxiv.org/pdf/2402.02716)
 2. [ReAct](https://arxiv.org/pdf/2210.03629)
-3. [ToT: Tree of Thought](http://arxiv.org/pdf/2305.10601)
-4. [LLM+P](https://arxiv.org/pdf/2304.11477)
+3. [Plan and Solve](https://arxiv.org/pdf/2305.04091)
+4. [ToT: Tree of Thought](http://arxiv.org/pdf/2305.10601)
+5. [LLM+P](https://arxiv.org/pdf/2304.11477)
 
