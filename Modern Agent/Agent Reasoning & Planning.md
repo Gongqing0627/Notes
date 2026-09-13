@@ -43,11 +43,23 @@
 ![](Pasted%20image%2020260910203810.png)
 
 ## Selection
+### ToT
+ToT 将问题的求解过程组织成一棵思维树：每一步生成多个候选思路，由大模型评估各候选状态的潜力，再由搜索算法选择保留和继续探索的分支，必要时剪枝或回退，直到得到答案。
+![688](Pasted%20image%2020260912132152.png)
 
+## External Planner
+### LLM + P
 
+![](Pasted%20image%2020260913135609.png)
+- **提供规则和示例**：人工定义可用动作、执行条件和效果，并提供一组“自然语言问题—PDDL”的示例。
+- **转换任务**：大模型将用户需求转成 PDDL 问题文件，明确对象、初始状态和目标。
+- **求解计划**：外部规划器结合规则和问题文件，搜索满足目标的动作序列。
+- **输出步骤**：大模型将动作序列翻译成易懂的自然语言。
 
 
 Reference:
 1. [Understanding the planning of LLM agents: A survey](https://arxiv.org/pdf/2402.02716)
 2. [ReAct](https://arxiv.org/pdf/2210.03629)
+3. [ToT: Tree of Thought](http://arxiv.org/pdf/2305.10601)
+4. [LLM+P](https://arxiv.org/pdf/2304.11477)
 
