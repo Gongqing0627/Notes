@@ -150,7 +150,7 @@ curl -v http://localhost:8000/
 
 # FastAPI
 ![](assets/Pasted%20image%2020260914222301.png)
-## HTTP API  FastAPI重实现（GET）
+## HTTP API  FastAPI重实现（GET&POST）
 ```python
 from fastapi import FastAPI
 from pydantic import BaseModel
