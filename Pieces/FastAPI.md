@@ -96,7 +96,7 @@ curl https://api.deepseek.com/chat/completions \
     - `finish_reason: "stop"`：模型正常结束输出。
     - `usage`：输入 **38 tokens**，输出 **46 tokens**，总计 **84 tokens**；输出中包含 **36 个推理 tokens**。
 
-## 简单的 HTTP API 服务端实现
+## 简单的 HTTP API 服务端实现（GET）
 
 ```python
 from http.server import BaseHTTPRequestHandler, HTTPServer
@@ -150,9 +150,13 @@ curl -v http://localhost:8000/
 
 # FastAPI
 ![](assets/Pasted%20image%2020260914222301.png)
-## HTTP API  FastAPI重实现
+## HTTP API  FastAPI重实现（GET）
 ```python
 from fastapi import FastAPI
+from pydantic import BaseModel
+
+class AnalyzeRequest(BaseModel):
+	text: str
 
 app = FastAPI()
 
@@ -161,9 +165,15 @@ profile = {
 }
 
 @app.get("/profile")
-	def read_profile():
+def read_profile():
+	return profile
 
-return profile
+@app.post("/analyze")
+def analyze(request: AnalyzeRequest):
+	return {
+		"text": request.text,
+		"message": "analyze success"
+		}
 ```
 
 ```bash
