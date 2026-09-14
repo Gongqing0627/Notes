@@ -150,3 +150,22 @@ curl -v http://localhost:8000/
 
 # FastAPI
 ![](assets/Pasted%20image%2020260914222301.png)
+## HTTP API  FastAPI重实现
+```python
+from fastapi import FastAPI
+
+app = FastAPI()
+
+profile = {
+	"name": "bytedance"
+}
+
+@app.get("/profile")
+	def read_profile():
+
+return profile
+```
+
+```bash
+uvicorn main:app --reload --port 8000
+```
