@@ -149,4 +149,4 @@ curl -v http://localhost:8000/
 
 
 # FastAPI
-![](Pasted%20image%2020260914222301.png)
+![](assets/Pasted%20image%2020260914222301.png)
