@@ -146,3 +146,7 @@ curl -v http://localhost:8000/
 * Closing connection 0
 {"name": "bytedance"}
 ```
+
+
+# FastAPI
+![](Pasted%20image%2020260914222301.png)
