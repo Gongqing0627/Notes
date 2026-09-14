@@ -11,7 +11,7 @@
 
 - **2022 年：思维链（CoT）研究**：研究者发现，在提示里给模型展示“逐步推导”的例子，就能提高它解决一些复杂问题的能力。**无需更换模型，也能改善推理表现。** [Google 研究](https://research.google/blog/language-models-perform-reasoning-via-chain-of-thought/)
 
-  ![](Pasted%20image%2020260909204546.png)
+  ![](assets/Pasted%20image%2020260909204546.png)
 
 - **2024 年 9 月：OpenAI o1-preview 发布**：一个重要转折点：通过大规模强化学习，专门训练模型分解问题、检查错误、尝试不同方法，并在回答前投入更多推理计算。它是这条路线的代表性产品，不能说是所有 AI 推理研究的起点。[发布说明](https://openai.com/index/learning-to-reason-with-llms/)
 
@@ -33,7 +33,7 @@
 
 >**How ????????**
 
-![523](Pasted%20image%2020260910033515.png)
+![523](assets/Pasted%20image%2020260910033515.png)
 ## Decomposition
 
 ### ReAct
@@ -41,20 +41,20 @@
 - **ReAct**：Thought（判断下一步）→ Action（执行操作）→ Observation（接收结果）→ 继续判断，直到完成
 - **ReAct → CoT-SC**：先执行ReAct，如果多步没有找到答案，采用CoT-SC。
 - **CoT-SC→ ReAct**：先生成n份推理和答案，如果没有大于n/2的统一答案，采用ReAct策略。
-![](Pasted%20image%2020260910203810.png)
+![](assets/Pasted%20image%2020260910203810.png)
 
 ### Plan and Solve
 普通的“请一步步思考”可能仍然漏步骤。PS 先让模型明确需要做哪些事，主要针对这种**遗漏中间步骤**的问题。论文还提出 PS+，加入提取变量、注意计算等更详细的指令，减少计算错误。
-![](Pasted%20image%2020260914014717.png)
+![](assets/Pasted%20image%2020260914014717.png)
 ## Selection
 ### ToT
 ToT 将问题的求解过程组织成一棵思维树：每一步生成多个候选思路，由大模型评估各候选状态的潜力，再由搜索算法选择保留和继续探索的分支，必要时剪枝或回退，直到得到答案。
-![688](Pasted%20image%2020260912132152.png)
+![688](assets/Pasted%20image%2020260912132152.png)
 
 ## External Planner
 ### LLM + P
 
-![](Pasted%20image%2020260913135609.png)
+![](assets/Pasted%20image%2020260913135609.png)
 - **提供规则和示例**：人工定义可用动作、执行条件和效果，并提供一组“自然语言问题—PDDL”的示例。
 - **转换任务**：大模型将用户需求转成 PDDL 问题文件，明确对象、初始状态和目标。
 - **求解计划**：外部规划器结合规则和问题文件，搜索满足目标的动作序列。
