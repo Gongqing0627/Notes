@@ -35,7 +35,6 @@
 
 ![523](assets/Pasted%20image%2020260910033515.png)
 ## Decomposition
-
 ### ReAct
 - **CoT-SC(Cot-Self-Consistency)**：让模型生成多份推理和答案，投票决定最终答案
 - **ReAct**：Thought（判断下一步）→ Action（执行操作）→ Observation（接收结果）→ 继续判断，直到完成
