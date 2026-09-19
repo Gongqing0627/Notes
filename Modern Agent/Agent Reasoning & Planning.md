@@ -60,7 +60,7 @@ ToT 将问题的求解过程组织成一棵思维树：每一步生成多个候�
 - **输出步骤**：大模型将动作序列翻译成易懂的自然语言。
 
 
-Reference:
+# References:
 1. [Understanding the planning of LLM agents: A survey](https://arxiv.org/pdf/2402.02716)
 2. [ReAct](https://arxiv.org/pdf/2210.03629)
 3. [Plan and Solve](https://arxiv.org/pdf/2305.04091)
