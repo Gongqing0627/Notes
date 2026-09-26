@@ -120,6 +120,11 @@ class Plan(BaseModel):
 		description="different steps to follow, should be in sorted order"
 	)
 ```
+定义模型输出的格式，并校验数据类型：
+- 输出包含一个 **`steps` 字段**。
+- `steps` 是一个**字符串列表**。
+- 描述告诉模型：步骤要按执行顺序排列，但代码本身不会自动排序。
+## Create a Planner
 ```python
 
 planner_prompt = ChatPromptTemplate.from_messages(
@@ -143,7 +148,149 @@ planner = planner_prompt | ChatOpenAI(
     model="gpt-4o",
     temperature=0,
 ).with_structured_output(Plan)
+
+planner.invoke(
+    {
+        "messages": [
+            ("user", "what is the hometown of the current Australia open winner?")
+        ]
+    }
+)
+```
+```python
+Plan(steps=['Identify the current winner of the Australia Open.', 'Find the hometown of the identified winner.'])
 ```
 
+# Re-Plan Step
+
+## Create a Replanner
+```python
+class Response(BaseModel):
+    """Response to user."""
+
+    response: str
+
+class Act(BaseModel):
+    """Action to perform."""
+
+    action: Union[Response, Plan] = Field(
+        description="Action to perform. If you want to respond to user, use Response. "
+        "If you need to further use tools to get the answer, use Plan."
+    )
+
+replanner_prompt = ChatPromptTemplate.from_template(
+    """For the given objective, come up with a simple step by step plan. \
+This plan should involve individual tasks, that if executed c·rrectly will yield the correct answer. Do not add any superfluous steps. \
+The result of the final step should be the final answer. Make sure that each step has all the information needed - do not skip steps.
+
+Your objective was this:
+{input}
+
+Your original plan was this:
+{plan}
+
+You have currently done the follow steps:
+{past_steps}
+
+Update your plan accordingly. If no more steps are needed and you can return to the user, then respond with that. Otherwise, fill out the plan. Only add steps to the plan that still NEED to be done. Do not return previously done steps as part of the plan."""
+)
+
+replanner = replanner_prompt | ChatOpenAI(
+    model="gpt-4o", temperature=0
+).with_structured_output(Act)
+
+```
+
+# Create the Graph
+Graph 是用来控制整个任务流程的：先规划，再执行，执行后判断下一步做什么，直到完成。
+Graph中的Nodes之间通过 **`state` 共享数据**，例如用户任务、当前计划、已经完成的步骤。节点读取这些数据，再返回需要更新的字段；Graph 的**连线和条件分支**决定接下来运行哪个节点。
+## Nodes
+```python
+from langgraph.graph import END
+
+async def execute_step(state: PlanExecute):
+    plan = state["plan"]
+    plan_str = "\n".join(f"{i + 1}. {step}" for i, step in enumerate(plan))
+    task = plan[0]
+    task_formatted = f"""For the following plan:
+{plan_str}\n\nYou are tasked with executing step {1}, {task}."""
+    agent_response = await agent_executor.ainvoke(
+        {"messages": [("user", task_formatted)]}
+    )
+    return {
+        "past_steps": [(task, agent_response["messages"][-1].content)],
+    }
+
+async def plan_step(state: PlanExecute):
+    plan = await planner.ainvoke({"messages": [("user", state["input"])]})
+    return {"plan": plan.steps}
+
+async def replan_step(state: PlanExecute):
+    output = await replanner.ainvoke(state)
+    if isinstance(output.action, Response):
+        return {"response": output.action.response}
+    else:
+        return {"plan": output.action.steps}
+
+def should_end(state: PlanExecute):
+    if "response" in state and state["response"]:
+        return END
+    else:
+        return "agent"
+
+```
+
+# Graph
+```python
+from langgraph.graph import StateGraph, START
+
+workflow = StateGraph(PlanExecute)
+
+# Add the plan node
+workflow.add_node("planner", plan_step)
+
+# Add the execution step
+workflow.add_node("agent", execute_step)
+
+# Add a replan node
+workflow.add_node("replan", replan_step)
+
+workflow.add_edge(START, "planner")
+
+# From plan we go to agent
+workflow.add_edge("planner", "agent")
+
+# From agent, we replan
+workflow.add_edge("agent", "replan")
+
+workflow.add_conditional_edges(
+    "replan",
+    # Next, we pass in the function that will determine which node is called next.
+    should_end,
+    ["agent", END],
+)
+
+# Finally, we compile it!
+# This compiles it into a LangChain Runnable,
+# meaning you can use it as you would any other runnable
+app = workflow.compile()
+```
+![](assets/Pasted%20image%2020260926212922.png)
+# Run and Stream
+```python
+config = {"recursion_limit": 50}
+inputs = {"input": "what is the hometown of the mens 2024 Australia open winner?"}
+async for event in app.astream(inputs, config=config):
+    for k, v in event.items():
+        if k != "__end__":
+            print(v)
+```
+```python
+{'plan': ["Identify the winner of the men's 2024 Australian Open.", 'Research the hometown of the identified winner.']}
+{'past_steps': [("Identify the winner of the men's 2024 Australian Open.", "The winner of the men's singles tennis title at the 2024 Australian Open was Jannik Sinner. He defeated Daniil Medvedev in the final with scores of 3-6, 3-6, 6-4, 6-4, 6-3 to win his first major singles title.")]}
+{'plan': ['Research the hometown of Jannik Sinner.']}
+{'past_steps': [('Research the hometown of Jannik Sinner.', "Jannik Sinner's hometown is Sexten, which is located in northern Italy.")]}
+{'response': "The hometown of the men's 2024 Australian Open winner, Jannik Sinner, is Sexten, located in northern Italy."}
+```
 # References:
 1. [Plan-and-Execute](https://github.com/langchain-ai/langgraph/blob/23961cff61a42b52525f3b20b4094d8d2fba1744/docs/docs/tutorials/plan-and-execute/plan-and-execute.ipynb)
