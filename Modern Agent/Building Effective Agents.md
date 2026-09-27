@@ -62,7 +62,7 @@ output = agent_with_tool.invoke({"messages": [{"role": "user", "content": "Multi
 将一个可以拆解的大任务分成多个步骤，每次调用 LLM 时，都把上一步的输出作为下一步的输入。
 - **翻译文档**：先翻译，再润色或检查。
 - **检查生成内容的一致性**：先生成内容，再让另一次调用检查前后是否矛盾，例如人物名字、日期、结论是否一致。
-
+![](assets/Pasted%20image%2020260928015357.png)
 
 
 # References

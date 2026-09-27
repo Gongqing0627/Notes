@@ -1,7 +1,7 @@
+# Overview
 > Agent = Model + Harness
 > The harness is everything around the model loop: the prompt, the tools, and any middleware that shapes behavior.
-
-# Create an agent
+## Create an agent
 
 用 LangChain 将 DeepSeek 模型和一个模拟天气查询工具组合成智能体，回答用户的天气问题。
 ```python
