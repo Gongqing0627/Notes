@@ -125,7 +125,10 @@ chain = workflow.compile()
 # runrunrun！！！！！！
 state = chain.invoke({"topic": "cats"})
 ```
-# 
+# Parallelization
+
+
+
 # References
 1. [Building effective agents](https://www.anthropic.com/engineering/building-effective-agents)
 2. [Workflows and agents](https://docs.langchain.com/oss/python/langgraph/workflows-agents)
