@@ -105,8 +105,27 @@ def polish_joke(state: State):
     return {"final_joke": msg.content}
 ```
 ## Build Graph
+```python
+workflow = StateGraph(State)
 
+workflow.add_node("generate_joke", generate_joke)
+workflow.add_node("improve_joke", improve_joke)
+workflow.add_node("polish_joke", polish_joke)
 
+workflow.add_edge(START, "generate_joke")
+"""注意⚠️：check_punchline只作为一个判断函数"""
+workflow.add_conditional_edges(
+    "generate_joke", check_punchline, {"Pass": END, "Fail": "improve_joke"}
+)
+workflow.add_edge("improve_joke", "polish_joke")
+workflow.add_edge("polish_joke", END)
+
+chain = workflow.compile()
+
+# runrunrun！！！！！！
+state = chain.invoke({"topic": "cats"})
+```
+# 
 # References
 1. [Building effective agents](https://www.anthropic.com/engineering/building-effective-agents)
 2. [Workflows and agents](https://docs.langchain.com/oss/python/langgraph/workflows-agents)
