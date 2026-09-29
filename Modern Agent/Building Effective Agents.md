@@ -86,13 +86,12 @@ def generate_joke(state: State):
     msg = llm.invoke(f"Generate a joke about {state['topic']}")
     return {"joke": msg.content}
 
-
+"""注意⚠️：该函数在后续流程中仅用于条件判断，不作为节点注册。"""
 def check_punchline(state: State):
     """Gate function to check the punchline of a joke."""
     if "!" in state["joke"] or "?" in state["joke"]:
         return "Pass"
     return "Fail"
-
 
 def improve_joke(state: State):
     """Second LLM to improve a joke."""
