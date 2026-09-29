@@ -79,8 +79,33 @@ class State(TypedDict):
     improved_joke: str
     final_joke: str
 ```
+## Define Nodes
+```python
+def generate_joke(state: State):
+    """First LLM to generate a joke about a topic."""
+    msg = llm.invoke(f"Generate a joke about {state['topic']}")
+    return {"joke": msg.content}
+
+
+def check_punchline(state: State):
+    """Gate function to check the punchline of a joke."""
+    if "!" in state["joke"] or "?" in state["joke"]:
+        return "Pass"
+    return "Fail"
+
+
+def improve_joke(state: State):
+    """Second LLM to improve a joke."""
+    msg = llm.invoke(f"Make this joke funnier by adding wordplay: {state['joke']}")
+    return {"improved_joke": msg.content}
+
+
+def polish_joke(state: State):
+    """Third LLM to polish a joke."""
+    msg = llm.invoke(f"Add a surprising twist to this joke: {state['improved_joke']}")
+    return {"final_joke": msg.content}
+```
+
 # References
 1. [Building effective agents](https://www.anthropic.com/engineering/building-effective-agents)
 2. [Workflows and agents](https://docs.langchain.com/oss/python/langgraph/workflows-agents)
-
-[^1]: 
