@@ -63,8 +63,24 @@ output = agent_with_tool.invoke({"messages": [{"role": "user", "content": "Multi
 - **翻译文档**：先翻译，再润色或检查。
 - **检查生成内容的一致性**：先生成内容，再让另一次调用检查前后是否矛盾，例如人物名字、日期、结论是否一致。
 ![](assets/Pasted%20image%2020260928015357.png)
+## Define LLM and Graph State
+[Planning Agent](Planning%20Agent.md)该文档包含对 State 的相关说明。
+```python
+llm = ChatOpenAI(
+    model="deepseek-chat",
+    api_key=os.environ["DEEPSEEK_API_KEY"],
+    base_url="https://api.deepseek.com",
+)
 
 
+class State(TypedDict):
+    topic: str
+    joke: str
+    improved_joke: str
+    final_joke: str
+```
 # References
 1. [Building effective agents](https://www.anthropic.com/engineering/building-effective-agents)
 2. [Workflows and agents](https://docs.langchain.com/oss/python/langgraph/workflows-agents)
+
+[^1]: 
