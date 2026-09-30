@@ -126,7 +126,7 @@ chain = workflow.compile()
 state = chain.invoke({"topic": "cats"})
 ```
 # Parallelization
-
+关于并行化，LLMs可以一起同时工作。
 
 
 # References
