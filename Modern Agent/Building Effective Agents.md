@@ -187,6 +187,7 @@ print(result["combined_output"])
 # Routing
 路由工作流会先识别输入的类型或意图，再将其分配到相应的处理节点。
 ![](assets/Pasted%20image%2020261001203151.png)
+根据不同的用户输入路由到对应的节点：
 ```python
 class State(TypedDict):
     input: str
@@ -260,8 +261,34 @@ workflow = workflow.compile()
 result = workflow.invoke({"input": "Write a joke about cats"})
 print(result["output"])
 ```
+# Orchestrator-worker
+**Orchestrator** 英语原意是“编曲者”，在AI 工作流中通常译为 **“编排器”或“协调者”**。
+在 **Orchestrator-worker范式**中，Orchestrator 主要负责：
+- **分解任务**：将复杂任务拆解为多个子任务。
+- **分配任务**：将子任务交给相应的执行者（Worker，如子代理）处理。
+- **整合结果**：汇总各执行者的输出，形成完整的最终结果。
+
+这段代码实现了一个**自动拆分任务、并行撰写章节、最后汇总成报告的工作流**
+```python
+class Section(BaseModel):
+	"""BaseModel 会在运行时校验数据"""
+    name: str = Field(
+        description="Name for this section of the report.",
+    )
+    description: str = Field(
+        description="Brief overview of the main topics and concepts to be covered in this section.",
+    )
 
 
+class Sections(BaseModel):
+    sections: List[Section] = Field(
+        description="Sections of the report.",
+    )
+
+
+# Augment the LLM with schema for structured output
+planner = llm.with_structured_output(Sections)
+```
 
 # References
 1. [Building effective agents](https://www.anthropic.com/engineering/building-effective-agents)
