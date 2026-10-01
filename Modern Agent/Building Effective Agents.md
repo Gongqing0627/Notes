@@ -126,7 +126,141 @@ chain = workflow.compile()
 state = chain.invoke({"topic": "cats"})
 ```
 # Parallelization
-关于并行化，LLMs可以一起同时工作。
+关于并行化，LLMs可以一起同时工作。具体做法包括：同时执行多个相互独立的子任务，或多次执行同一项任务，以比较不同的输出结果。并行处理通常用于：
+- 拆分子任务并同时执行，提高处理速度。
+- 多次执行同一项任务并比较输出结果，提高结果的可信度。
+![](assets/Pasted%20image%2020261001180951.png)
+```python
+class State(TypedDict):
+    topic: str
+    joke: str
+    story: str
+    poem: str
+    combined_output: str
+
+
+def call_llm1(state: State) -> State:
+    response = llm.invoke("Write a joke about " + state["topic"])
+    return {"joke": response.content}
+
+
+def call_llm2(state: State) -> State:
+    response = llm.invoke("Write a story about " + state["topic"])
+    return {"story": response.content}
+
+
+def call_llm3(state: State) -> State:
+    response = llm.invoke("Write a poem about " + state["topic"])
+    return {"poem": response.content}
+
+
+def aggregator(state: State) -> State:
+    combined = f"Here's a story, joke, and poem about {state['topic']}!\n\n"
+    combined += f"STORY:\n{state['story']}\n\n"
+    combined += f"JOKE:\n{state['joke']}\n\n"
+    combined += f"POEM:\n{state['poem']}"
+    return {"combined_output": combined}
+
+
+workflow = StateGraph(State)
+
+workflow.add_node("call_llm1", call_llm1)
+workflow.add_node("call_llm2", call_llm2)
+workflow.add_node("call_llm3", call_llm3)
+workflow.add_node("aggregator", aggregator)
+
+workflow.add_edge(START, "call_llm1")
+workflow.add_edge(START, "call_llm2")
+workflow.add_edge(START, "call_llm3")
+
+workflow.add_edge("call_llm1", "aggregator")
+workflow.add_edge("call_llm2", "aggregator")
+workflow.add_edge("call_llm3", "aggregator")
+
+workflow.add_edge("aggregator", END)
+
+workflow = workflow.compile()
+
+result = workflow.invoke({"topic": "cats"})
+print(result["combined_output"])
+```
+# Routing
+路由工作流会先识别输入的类型或意图，再将其分配到相应的处理节点。
+![](assets/Pasted%20image%2020261001203151.png)
+```python
+class State(TypedDict):
+    input: str
+    decision: str
+    output: str
+
+
+router = llm.with_structured_output(Route)
+
+
+def router_node(state: State) -> State:
+    decision = router.invoke([
+        SystemMessage(
+            content="Route the input to story, joke, or poem based on the user's request."
+        ),
+        HumanMessage(content=state["input"]),
+    ])
+    return {"decision": decision.step}
+
+"""注意⚠️：此函数作为判断函数，不会作为节点注册"""
+def router_decision(state: State) -> str:
+    if state["decision"] == "joke":
+        return "call_llm1"
+    elif state["decision"] == "story":
+        return "call_llm2"
+    else:
+        return "call_llm3"
+
+
+def call_llm1(state: State) -> State:
+    response = llm.invoke(state["input"])
+    return {"output": response.content}
+
+
+def call_llm2(state: State) -> State:
+    response = llm.invoke(state["input"])
+    return {"output": response.content}
+
+
+def call_llm3(state: State) -> State:
+    response = llm.invoke(state["input"])
+    return {"output": response.content}
+
+
+workflow = StateGraph(State)
+
+workflow.add_node("router_node", router_node)
+workflow.add_node("call_llm1", call_llm1)
+workflow.add_node("call_llm2", call_llm2)
+workflow.add_node("call_llm3", call_llm3)
+
+workflow.add_edge(START, "router_node")
+
+"""注意⚠️：条件边的写法"""
+workflow.add_conditional_edges(
+    "router_node",
+    router_decision,
+    {
+        "call_llm1": "call_llm1",
+        "call_llm2": "call_llm2",
+        "call_llm3": "call_llm3",
+    },
+)
+
+workflow.add_edge("call_llm1", END)
+workflow.add_edge("call_llm2", END)
+workflow.add_edge("call_llm3", END)
+
+workflow = workflow.compile()
+
+result = workflow.invoke({"input": "Write a joke about cats"})
+print(result["output"])
+```
+
 
 
 # References
