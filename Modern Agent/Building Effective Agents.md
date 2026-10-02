@@ -488,8 +488,49 @@ workflow = workflow.compile()
 result = workflow.invoke({"topic": "cat"})
 ```
 # Agent
+> **When to use agents:** Agents can be used for open-ended problems where it’s difficult or impossible to predict the required number of steps, and where you can’t hardcode a fixed path.
 ![](assets/Pasted%20image%2020261002230037.png)
 
+```python
+# Define tools
+@tool
+def multiply(a: int, b: int) -> int:
+    """Multiply `a` and `b`.
+
+    Args:
+        a: First int
+        b: Second int
+    """
+    return a * b
+
+
+@tool
+def add(a: int, b: int) -> int:
+    """Adds `a` and `b`.
+
+    Args:
+        a: First int
+        b: Second int
+    """
+    return a + b
+
+
+@tool
+def divide(a: int, b: int) -> float:
+    """Divide `a` and `b`.
+
+    Args:
+        a: First int
+        b: Second int
+    """
+    return a / b
+
+
+# Augment the LLM with tools
+tools = [add, multiply, divide]
+tools_by_name = {tool.name: tool for tool in tools}
+llm_with_tools = llm.bind_tools(tools)
+```
 
 
 1. [Building effective agents](https://www.anthropic.com/engineering/building-effective-agents)
