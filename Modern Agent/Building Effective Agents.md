@@ -289,7 +289,8 @@ class Sections(BaseModel):
 # Augment the LLM with schema for structured output
 planner = llm.with_structured_output(Sections)
 ```
+Orchestrator-worker（编排器—执行者）工作流很常见，LangGraph 为这种模式提供了内置支持。`Send` API 允许动态创建 Worker 节点，并向它们发送指定的输入。
+每个 Worker 都有自己的状态，而所有 Worker 的输出都会写入一个共享的状态字段。
 
-# References
 1. [Building effective agents](https://www.anthropic.com/engineering/building-effective-agents)
 2. [Workflows and agents](https://docs.langchain.com/oss/python/langgraph/workflows-agents)
