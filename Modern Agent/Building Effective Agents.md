@@ -403,6 +403,94 @@ from IPython.display import Markdown
 
 Markdown(state["final_report"])
 ```
+# Evaluator-optimizer
+在 **Evaluator-optimizer范式**中，Generator先生成答案，再由 Evaluator检查是否符合要求。若通过评估，则输出答案；若未通过，则提供修改建议，由 Generator 根据反馈改进答案，并再次接受评估，直到满足要求或达到预设的迭代上限。
+这种工作流通常适用于**有明确的验收标准，但需要多次迭代才能达标的任务**。
+
+![](assets/Pasted%20image%2020261002222359.png)
+
+这段代码围绕topic生成笑话，并根据评价反馈反复改进，直到被评为Funny。
+```python
+class State(TypedDict):
+    topic: str
+    joke: str
+    feedback: str
+    funny_or_not: str
+
+
+def llm_call_generator(state: State) -> State:
+    if state.get("feedback"):
+        joke = llm.invoke([
+            SystemMessage(content="Improve the joke based on the feedback."),
+            HumanMessage(
+                content=f"Joke: {state['joke']}\nFeedback: {state['feedback']}"
+            ),
+        ])
+    else:
+        joke = llm.invoke([
+            SystemMessage(content="Generate a joke based on the topic."),
+            HumanMessage(content=state["topic"]),
+        ])
+
+    return {"joke": joke.content}
+
+
+class Feedback(BaseModel):
+    funny_or_not: Literal["funny", "not funny"] = Field(
+        description="Whether the joke is funny or not.",
+    )
+    feedback: None | str = Field(
+        description=(
+            "If the joke is not funny, please provide feedback to make "
+            "the joke more funny. Otherwise, please leave it empty."
+        ),
+    )
+
+
+evaluator = llm.with_structured_output(Feedback)
+
+
+def llm_call_evaluator(state: State) -> State:
+    feedback = evaluator.invoke([
+        SystemMessage(content="Evaluate the joke whether it is funny or not."),
+        HumanMessage(content=state["joke"]),
+    ])
+
+    return {
+        "funny_or_not": feedback.funny_or_not,
+        "feedback": feedback.feedback,
+    }
+
+
+def route_joke(state: State):
+    return "funny" if state["funny_or_not"] == "funny" else "not funny"
+
+
+workflow = StateGraph(State)
+
+workflow.add_node("generator", llm_call_generator)
+workflow.add_node("evaluator", llm_call_evaluator)
+
+workflow.add_edge(START, "generator")
+workflow.add_edge("generator", "evaluator")
+
+workflow.add_conditional_edges(
+    "evaluator",
+    route_joke,
+    {
+        "funny": END,
+        "not funny": "generator",
+    },
+)
+
+workflow = workflow.compile()
+
+result = workflow.invoke({"topic": "cat"})
+```
+# Agent
+![](assets/Pasted%20image%2020261002230037.png)
+
+
 
 1. [Building effective agents](https://www.anthropic.com/engineering/building-effective-agents)
 2. [Workflows and agents](https://docs.langchain.com/oss/python/langgraph/workflows-agents)
