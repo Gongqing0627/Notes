@@ -644,5 +644,6 @@ Tool Calls:
 Following order of operations: first 2 × 3 = 6, then 6 + 4 = 10.
 ```
 
+
 1. [Building effective agents](https://www.anthropic.com/engineering/building-effective-agents)
 2. [Workflows and agents](https://docs.langchain.com/oss/python/langgraph/workflows-agents)
