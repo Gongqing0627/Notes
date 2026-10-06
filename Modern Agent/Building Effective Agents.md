@@ -489,8 +489,9 @@ result = workflow.invoke({"topic": "cat"})
 ```
 # Agent
 > **When to use agents:** Agents can be used for open-ended problems where it’s difficult or impossible to predict the required number of steps, and where you can’t hardcode a fixed path.
-![](assets/Pasted%20image%2020261002230037.png)
 
+![](assets/Pasted%20image%2020261002230037.png)
+Define tools
 ```python
 # Define tools
 @tool
@@ -528,10 +529,120 @@ def divide(a: int, b: int) -> float:
 
 # Augment the LLM with tools
 tools = [add, multiply, divide]
+"""按名字找到工具，再传入参数"""
 tools_by_name = {tool.name: tool for tool in tools}
 llm_with_tools = llm.bind_tools(tools)
 ```
+Define nodes
+```python
+# Nodes
+def llm_call(state: MessagesState):
+    """LLM decides whether to call a tool or not"""
 
+    return {
+        "messages": [
+            llm_with_tools.invoke(
+                [
+                    SystemMessage(
+                        content="You are a helpful assistant tasked with performing arithmetic on a set of inputs."
+                    )
+                ]
+                + state["messages"]
+            )
+        ]
+    }
+
+
+def tool_node(state: MessagesState):
+    """Performs the tool call"""
+
+    result = []
+    for tool_call in state["messages"][-1].tool_calls:
+        tool = tools_by_name[tool_call["name"]]
+        observation = tool.invoke(tool_call["args"])
+        result.append(ToolMessage(content=observation, tool_call_id=tool_call["id"]))
+    return {"messages": result}
+
+
+# Conditional edge function to route to the tool node or end based upon whether the LLM made a tool call
+def should_continue(state: MessagesState) -> Literal["tool_node", END]:
+    """Decide if we should continue the loop or stop based upon whether the LLM made a tool call"""
+
+    messages = state["messages"]
+    last_message = messages[-1]
+
+    # If the LLM makes a tool call, then perform an action
+    if last_message.tool_calls:
+        return "tool_node"
+
+    # Otherwise, we stop (reply to the user)
+    return END
+
+
+# Build workflow
+agent_builder = StateGraph(MessagesState)
+
+# Add nodes
+agent_builder.add_node("llm_call", llm_call)
+agent_builder.add_node("tool_node", tool_node)
+
+# Add edges to connect nodes
+agent_builder.add_edge(START, "llm_call")
+agent_builder.add_conditional_edges(
+    "llm_call",
+    should_continue,
+    ["tool_node", END]
+)
+agent_builder.add_edge("tool_node", "llm_call")
+
+# Compile the agent
+agent = agent_builder.compile()
+
+# Show the agent
+display(Image(agent.get_graph(xray=True).draw_mermaid_png()))
+
+# Invoke
+messages = [HumanMessage(content="2 * 3 + 4.")]
+messages = agent.invoke({"messages": messages})
+for m in messages["messages"]:
+    m.pretty_print()
+```
+```python
+================================ Human Message =================================
+
+2 * 3 + 4
+================================== Ai Message ==================================
+
+I'll solve this step by step, following order of operations (multiplication before addition).
+
+First, let me multiply 2 * 3:
+Tool Calls:
+  multiply (call_00_4ie2Wovd3EwdXraWcrfA1216)
+ Call ID: call_00_4ie2Wovd3EwdXraWcrfA1216
+  Args:
+    a: 2
+    b: 3
+================================= Tool Message =================================
+
+6
+================================== Ai Message ==================================
+
+Now let me add 4 to that result:
+Tool Calls:
+  add (call_00_WDwahgLaYEwteuiPUkeM2102)
+ Call ID: call_00_WDwahgLaYEwteuiPUkeM2102
+  Args:
+    a: 6
+    b: 4
+================================= Tool Message =================================
+
+10
+================================== Ai Message ==================================
+
+**2 * 3 + 4 = 10**
+
+Following order of operations: first 2 × 3 = 6, then 6 + 4 = 10.
+```
 
 1. [Building effective agents](https://www.anthropic.com/engineering/building-effective-agents)
 2. [Workflows and agents](https://docs.langchain.com/oss/python/langgraph/workflows-agents)
