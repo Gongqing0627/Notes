@@ -55,4 +55,3 @@ agent = create_agent(
 
 
 # References
-1. [Langchain](![](assets/Pasted%20image%2020260929183942.png))
