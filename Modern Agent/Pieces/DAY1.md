@@ -19,4 +19,6 @@
 1. **页面向量化**：按照页面做图片Embedding，用问题向量和图片向量做匹配。[ColPali](https://arxiv.org/pdf/2407.01449)
 2. **保留元信息**：切块后保留页码，页眉页脚信息。表格保留表头和标题。保留标题层级。
 3. **给chunk保留上下文信息**：表明属于哪个章节，上下文在讲什么
-4. **Agent工具链动态调用**：封装PDF工具集合，比如说我想找片段用search_PDF,具体读那一页面就用read_page,抽取表格用Extract——table，提取返回所有索引![[Pasted image 20261111183701.png]]
+4. **Agent工具链动态调用**：封装PDF工具集合，比如说我想找片段用search_PDF,具体读那一页面就用read_page,抽取表格用Extract——table，提取返回所有索引quote_source。简单事实就调用语意召回 xxx待补全具体场景
+5. **避免幻觉**：强制UI带溯源功能，引用内容只能针对
+6. ![[Pasted image 20261111183701.png]]
