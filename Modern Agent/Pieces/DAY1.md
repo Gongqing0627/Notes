@@ -28,4 +28,6 @@
 分为以下四层：
 
 1. **提示词规约**：直接将Schema放入Prompt，定死字段和类型，并提供2-3个正例子。由于近因效应，要把这些写到prompt的后端。
-2. **闭源API**：JSON Mode/Structured Outputs，
+2. **生成控制**：闭源API，JSON Mode/Structured Outputs。开源模型私有化部署，Logit Masking，预测下一个词的时候将不合法的数据写成负无穷。
+3. **工程校验和修复**：Pydantic强校验，对于缺括号等小瑕疵可以先用JSON Repair做修复，如果还不行，把报错信息输入给大模型重新生成。如果在生成过程中发现字段不匹配，可以直接打断重来，节省token以及时间。
+4. **终极手段**：SFT监督微调。
