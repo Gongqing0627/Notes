@@ -26,4 +26,6 @@
 # 3、大模型怎么稳定输出JSON？
 
 分为以下四层：
-1. 
+
+1. **提示词规约**：直接将Schema放入Prompt，定死字段和类型，并提供2-3个正例子。由于近因效应，要把这些写到prompt的后端。
+2. **闭源API**：JSON Mode/Structured Outputs，
