@@ -6,6 +6,3 @@
 
 ### AI Agent Flow:
 - Clarification -> Brief -> Supervisor -> Research -> Report
-
-### Tools
-- We
