@@ -14,4 +14,6 @@
 - Peak RPS(Requests Per Second) & Seasonality （请求数据是否有季节性） 
 - 数据存储：关系数据库 or 向量数据库
 
+## Agent system
 
+![[Pasted image 20261120010504.png]]
