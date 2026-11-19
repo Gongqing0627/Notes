@@ -11,7 +11,7 @@
 - 换货政策：商品状态，允许换货的类别
 - 人类兜底处理：用户想要一个人工客服，用户情绪检测
 ### Backend/DB
-- Peak RPS & Seasonality
-- Data Storage to R e la
+- Peak RPS(Requests Per Second) & Seasonality （请求数据是否有季节性） 
+- 数据存储：关系数据库 or 向量数据库
 
 
