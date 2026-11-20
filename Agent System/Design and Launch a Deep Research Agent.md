@@ -6,3 +6,5 @@
 
 ### AI Agent Flow:
 - Clarification -> Brief -> Supervisor -> Research -> Report
+
+![[Pasted image 20261120145004.png]]
