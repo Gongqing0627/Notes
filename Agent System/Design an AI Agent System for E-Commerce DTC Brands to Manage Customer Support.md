@@ -16,4 +16,4 @@
 
 ## Agent system
 
-![[Pasted image 20261120010504.png]]
+![](assets/Pasted%20image%2020261120010504.png)
